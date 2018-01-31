@@ -1,0 +1,6 @@
+[package]
+name = "rust_editor"
+version = "0.1.0"
+authors = ["sora0920 <sora02230112@gmail.com>"]
+
+[dependencies]
