@@ -2,8 +2,43 @@ use std::fs::File;
 use std::io::{BufReader, Read, Write};
 use std::io::stdout;
 use std::env::args;
+use List::*;
 
 const BUFFER_SIZE: usize = 2048;
+
+enum str {
+    Cons(u32, Box<List>),
+    Nil,
+}
+
+impl List {
+    fn new() -> List {
+        Nil
+    }
+
+    fn prepend(self, elem: u32) -> List{
+        Cons(elem, Box::new(self))
+    }
+
+    fn len(&self) -> u32 {
+        match *self {
+            Cons(_, ref tail) => 1 + tail.len(),
+
+            Nil => 0
+        }
+    }
+
+    fn stringify(&self) -> String {
+        match *self {
+            Cons(head, ref tail) => {
+                format!("{}, {}", head, tail.stringify())
+            },
+            Nil => {
+                format!("Nil")
+            }
+        }
+    }
+}
 
 fn main() {
     std::io::stdout().write_all("\x1b[2J\x1b[1;1H".as_bytes()).unwrap();
