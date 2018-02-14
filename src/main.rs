@@ -1,12 +1,16 @@
 use std::fs::File;
-use std::io::{BufReader, Read, Write};
+use std::error::Error;
+use std::fs;
+use std::env;
+use std::io::{BufReader, Read};
+use std::str;
 use std::io::stdout;
-use std::env::args;
 use List::*;
+use std::io::Write;
 
 const BUFFER_SIZE: usize = 2048;
 
-enum str {
+enum List {
     Cons(u32, Box<List>),
     Nil,
 }
@@ -35,18 +39,19 @@ impl List {
             },
             Nil => {
                 format!("Nil")
-            }
+            },
         }
     }
 }
 
 fn main() {
+    let paths: Vec<String> = env::args().skip(1).collect();
+    let mut text = String::new();
+
     std::io::stdout().write_all("\x1b[2J\x1b[1;1H".as_bytes()).unwrap();
     // clear
     // std::io::stdout().write_all("\x1b[31m\x1b[47m".as_bytes()).unwrap();
 
-    let paths: Vec<String> = args().skip(1).collect();
-    // 引数のpathを格納
     if paths.is_empty() {
         panic!("file name not given");
     }
@@ -54,21 +59,31 @@ fn main() {
 
     let mut writer = stdout();
     for path in paths {
-        do_cat(&mut writer, &path);
+        file_read(&mut text, &path);
     }
     // pathの数だけdo_cat
 }
 
-fn do_cat(writer: &mut Write, path: &str) {
-    let file = File::open(path).unwrap();
-    // 流れてきたPathをOpen
-    let mut reader = BufReader::new(&file);
-    // リーダーを作成
-    let mut buf = [0; BUFFER_SIZE];
-    loop {
-        let n = reader.read(&mut buf).unwrap();
-        if n == 0 { break; }
-        writer.write_all(&buf[..n]).unwrap();
-    }
+fn file_read(text: &mut String, path: &str) {
+    let mut f = File::open(path).unwrap();
+
+    match f.read_to_string(text){
+        Err(why) => panic!("couldn't read {}: {}", path,
+                                                   Error::description(&why)),
+        Ok(_) => println!("FileReadOK!")
+    };
+    println!("{}", text);
+
+    
+//    let file = File::open(path).unwrap();
+//    // 流れてきたPathをOpen
+//    let mut reader = BufReader::new(&file);
+//    // リーダーを作成
+//    let mut buf = [0; BUFFER_SIZE];
+//    loop {
+//        let n = reader.read(&mut buf).unwrap();
+//        if n == 0 { break; }
+//        writer.write_all(&buf[..n]).unwrap();
+//    }
     // リーダーから受け取った内容を表示
 }
