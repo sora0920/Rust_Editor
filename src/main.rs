@@ -1,3 +1,5 @@
+extern crate ncurses;
+
 use std::fs::File;
 use std::error::Error;
 use std::fs;
@@ -6,7 +8,10 @@ use std::io::{BufReader, Read};
 use std::str;
 use std::io::stdout;
 use List::*;
+use ncurses::*;
 use std::io::Write;
+use std::char;
+
 
 const BUFFER_SIZE: usize = 2048;
 
@@ -54,6 +59,7 @@ fn main() {
 
     if paths.is_empty() {
         panic!("file name not given");
+        // New File 
     }
     // pathが空ならねーよってキレる
 
@@ -72,7 +78,27 @@ fn file_read(text: &mut String, path: &str) {
                                                    Error::description(&why)),
         Ok(_) => println!("FileReadOK!")
     };
-    println!("{}", text);
+    //println!("{}", text);
+      /* Start ncurses. */
+    initscr();
+
+    cbreak();
+
+    keypad(stdscr(), true);
+    noecho();
+  /* Print to the back buffer. */
+    printw(text);
+
+  /* Print some unicode(Chinese) string. */
+  // printw("Great Firewall dislike VPN protocol.\nGFW 不喜欢 VPN 协议。";
+
+  /* Update the screen. */
+    refresh();
+
+  // Wait for a key press. 
+
+  /* Terminate ncurses. */
+    endwin();
 
     
 //    let file = File::open(path).unwrap();
